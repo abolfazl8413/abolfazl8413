@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Material 3 - Single File (HTML/CSS/JS)</title>
+    <style>
+      /*
+        Material 3 – Single-file implementation (approximate)
+        - RTL-friendly using logical properties (inset-inline-start, margin-inline, etc.)
+        - Light/Dark themes via CSS variables on <html data-theme>
+        - Components: Top App Bar, Buttons, Text Fields, Switch, Checkbox, Cards,
+          Dialog, Snackbar, FAB, Bottom Navigation
+      */
+
+      /* Reset & base */
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-background);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      :root {
+        /* Colors – Light theme (Baseline M3 Purple) */
+        --md-sys-color-primary: #6750A4;
+        --md-sys-color-on-primary: #FFFFFF;
+        --md-sys-color-primary-container: #EADDFF;
+        --md-sys-color-on-primary-container: #21005D;
+
+        --md-sys-color-secondary: #625B71;
+        --md-sys-color-on-secondary: #FFFFFF;
+        --md-sys-color-secondary-container: #E8DEF8;
+        --md-sys-color-on-secondary-container: #1D192B;
+
+        --md-sys-color-tertiary: #7D5260;
+        --md-sys-color-on-tertiary: #FFFFFF;
+        --md-sys-color-tertiary-container: #FFD8E4;
+        --md-sys-color-on-tertiary-container: #31111D;
+
+        --md-sys-color-error: #B3261E;
+        --md-sys-color-on-error: #FFFFFF;
+        --md-sys-color-error-container: #F9DEDC;
+        --md-sys-color-on-error-container: #410E0B;
+
+        --md-sys-color-background: #FFFBFE;
+        --md-sys-color-on-background: #1C1B1F;
+        --md-sys-color-surface: #FFFBFE;
+        --md-sys-color-on-surface: #1C1B1F;
+        --md-sys-color-surface-variant: #E7E0EC;
+        --md-sys-color-on-surface-variant: #49454F;
+        --md-sys-color-outline: #79747E;
+        --md-sys-color-outline-variant: #CAC4D0;
+        --md-sys-color-inverse-surface: #313033;
+        --md-sys-color-inverse-on-surface: #F4EFF4;
+        --md-sys-color-inverse-primary: #D0BCFF;
+        --md-sys-color-scrim: rgba(0,0,0,0.32);
+
+        /* Elevation (shadow) */
+        --elevation-0: none;
+        --elevation-1: 0 1px 2px rgba(0,0,0,0.14), 0 1px 3px 1px rgba(0,0,0,0.12);
+        --elevation-2: 0 2px 3px rgba(0,0,0,0.14), 0 3px 5px 1px rgba(0,0,0,0.12);
+        --elevation-3: 0 4px 8px rgba(0,0,0,0.16), 0 2px 4px 1px rgba(0,0,0,0.12);
+        --elevation-4: 0 8px 10px rgba(0,0,0,0.18), 0 3px 6px 2px rgba(0,0,0,0.14);
+        --elevation-5: 0 12px 17px rgba(0,0,0,0.2), 0 5px 7px 3px rgba(0,0,0,0.16);
+
+        /* Shapes */
+        --radius-xs: 4px;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 28px;
+        --radius-full: 9999px;
+
+        /* Spacing scale */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-7: 28px;
+        --space-8: 32px;
+
+        /* Typography (approximate) */
+        --font-size-title: 22px;
+        --font-size-body: 14px;
+        --font-size-label: 12px;
+        --font-weight-medium: 600;
+        --font-weight-regular: 400;
+      }
+
+      html[data-theme="dark"] {
+        --md-sys-color-primary: #D0BCFF;
+        --md-sys-color-on-primary: #381E72;
+        --md-sys-color-primary-container: #4F378B;
+        --md-sys-color-on-primary-container: #EADDFF;
+
+        --md-sys-color-secondary: #CCC2DC;
+        --md-sys-color-on-secondary: #332D41;
+        --md-sys-color-secondary-container: #4A4458;
+        --md-sys-color-on-secondary-container: #E8DEF8;
+
+        --md-sys-color-tertiary: #EFB8C8;
+        --md-sys-color-on-tertiary: #492532;
+        --md-sys-color-tertiary-container: #633B48;
+        --md-sys-color-on-tertiary-container: #FFD8E4;
+
+        --md-sys-color-error: #F2B8B5;
+        --md-sys-color-on-error: #601410;
+        --md-sys-color-error-container: #8C1D18;
+        --md-sys-color-on-error-container: #F9DEDC;
+
+        --md-sys-color-background: #1C1B1F;
+        --md-sys-color-on-background: #E6E1E5;
+        --md-sys-color-surface: #1C1B1F;
+        --md-sys-color-on-surface: #E6E1E5;
+        --md-sys-color-surface-variant: #49454F;
+        --md-sys-color-on-surface-variant: #CAC4D0;
+        --md-sys-color-outline: #938F99;
+        --md-sys-color-outline-variant: #49454F;
+        --md-sys-color-inverse-surface: #E6E1E5;
+        --md-sys-color-inverse-on-surface: #313033;
+        --md-sys-color-inverse-primary: #6750A4;
+        --md-sys-color-scrim: rgba(0,0,0,0.5);
+
+        --elevation-1: 0 1px 2px rgba(0,0,0,0.6), 0 1px 3px 1px rgba(0,0,0,0.45);
+        --elevation-2: 0 2px 3px rgba(0,0,0,0.6), 0 3px 5px 1px rgba(0,0,0,0.45);
+        --elevation-3: 0 4px 8px rgba(0,0,0,0.62), 0 2px 4px 1px rgba(0,0,0,0.5);
+        --elevation-4: 0 8px 10px rgba(0,0,0,0.64), 0 3px 6px 2px rgba(0,0,0,0.55);
+        --elevation-5: 0 12px 17px rgba(0,0,0,0.66), 0 5px 7px 3px rgba(0,0,0,0.58);
+      }
+
+      /* Utilities */
+      .elevation-1 { box-shadow: var(--elevation-1); }
+      .elevation-2 { box-shadow: var(--elevation-2); }
+      .elevation-3 { box-shadow: var(--elevation-3); }
+      .elevation-4 { box-shadow: var(--elevation-4); }
+      .elevation-5 { box-shadow: var(--elevation-5); }
+
+      .container {
+        max-width: 1100px;
+        margin-inline: auto;
+        padding: 16px;
+        padding-bottom: 88px; /* space for bottom nav */
+      }
+
+      /* Top App Bar */
+      .top-app-bar {
+        position: sticky;
+        top: 0;
+        inset-inline: 0;
+        z-index: 10;
+        background: var(--md-sys-color-surface);
+        color: var(--md-sys-color-on-surface);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        height: 64px;
+        padding-inline: 12px;
+        box-shadow: var(--elevation-2);
+      }
+      .top-app-bar .title {
+        font-size: var(--font-size-title);
+        font-weight: var(--font-weight-medium);
+        letter-spacing: 0.15px;
+      }
+
+      /* Icon Button */
+      .md-icon-button {
+        position: relative;
+        display: inline-grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        color: var(--md-sys-color-on-surface);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .md-icon-button:hover { background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); }
+      .md-icon-button[data-variant="filled"] {
+        color: var(--md-sys-color-on-primary);
+        background: var(--md-sys-color-primary);
+      }
+
+      /* Buttons */
+      .md-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 0 24px;
+        border-radius: 20px;
+        border: none;
+        background: transparent;
+        color: var(--md-sys-color-primary);
+        cursor: pointer;
+        font-weight: var(--font-weight-medium);
+        letter-spacing: 0.1px;
+        overflow: hidden;
+      }
+      .md-button:disabled { opacity: 0.38; pointer-events: none; }
+      .md-button.filled {
+        background: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+        box-shadow: var(--elevation-1);
+      }
+      .md-button.tonal {
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+      }
+      .md-button.outlined {
+        border: 1px solid var(--md-sys-color-outline);
+        color: var(--md-sys-color-primary);
+        background: transparent;
+      }
+      .md-button.text { padding-inline: 12px; }
+      .md-button.elevated {
+        background: var(--md-sys-color-surface);
+        color: var(--md-sys-color-primary);
+        box-shadow: var(--elevation-1);
+      }
+
+      /* Ripple */
+      [data-ripple] { position: relative; overflow: hidden; }
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        transform: scale(0);
+        background: currentColor;
+        opacity: 0.12;
+        pointer-events: none;
+        animation: ripple 550ms ease-out;
+      }
+      @keyframes ripple {
+        to { transform: scale(1); opacity: 0; }
+      }
+
+      /* Text Field */
+      .md-field { position: relative; display: grid; gap: 4px; }
+      .md-field input[type="text"],
+      .md-field input[type="email"],
+      .md-field input[type="number"],
+      .md-field input[type="password"],
+      .md-field textarea {
+        width: 100%;
+        min-height: 56px;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--radius-sm);
+        background: var(--md-sys-color-surface);
+        color: var(--md-sys-color-on-surface);
+        padding: 20px 16px 6px 16px;
+        outline: none;
+        font-size: 14px;
+      }
+      .md-field input::placeholder, .md-field textarea::placeholder { color: transparent; }
+      .md-field label {
+        position: absolute;
+        inset-inline-start: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--md-sys-color-on-surface-variant);
+        pointer-events: none;
+        transition: all 140ms ease;
+        background: transparent;
+        padding-inline: 4px;
+      }
+      .md-field input:focus,
+      .md-field textarea:focus {
+        border-color: var(--md-sys-color-primary);
+        box-shadow: 0 0 0 1px var(--md-sys-color-primary) inset;
+      }
+      .md-field input:focus + label,
+      .md-field input:not(:placeholder-shown) + label,
+      .md-field textarea:focus + label,
+      .md-field textarea:not(:placeholder-shown) + label {
+        top: 6px;
+        transform: translateY(0);
+        font-size: 12px;
+        color: var(--md-sys-color-primary);
+        background: var(--md-sys-color-surface);
+      }
+      .md-field .supporting-text {
+        font-size: var(--font-size-label);
+        color: var(--md-sys-color-on-surface-variant);
+        margin-inline-start: 12px;
+      }
+
+      /* Switch */
+      .md-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .md-switch input { appearance: none; position: absolute; inset: 0; width: 0; height: 0; opacity: 0; }
+      .md-switch .track {
+        position: relative;
+        inline-size: 52px;
+        block-size: 32px;
+        border-radius: 16px;
+        background: color-mix(in oklab, var(--md-sys-color-on-surface) 24%, transparent);
+        transition: background 160ms ease;
+      }
+      .md-switch .thumb {
+        position: absolute;
+        inset-block-start: 2px;
+        inset-inline-start: 2px;
+        inline-size: 28px;
+        block-size: 28px;
+        border-radius: 14px;
+        background: var(--md-sys-color-surface);
+        box-shadow: var(--elevation-2);
+        transition: inset-inline-start 160ms ease, background 160ms ease;
+      }
+      .md-switch input:checked ~ .track { background: var(--md-sys-color-primary); }
+      .md-switch input:checked ~ .track .thumb {
+        inset-inline-start: 22px;
+        background: var(--md-sys-color-on-primary);
+      }
+      .md-switch .label-text { color: var(--md-sys-color-on-surface); font-size: var(--font-size-body); }
+
+      /* Checkbox */
+      .md-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .md-checkbox input { appearance: none; position: absolute; inset: 0; width: 0; height: 0; opacity: 0; }
+      .md-checkbox .box {
+        inline-size: 18px;
+        block-size: 18px;
+        border-radius: 4px;
+        border: 2px solid var(--md-sys-color-on-surface-variant);
+        display: grid;
+        place-items: center;
+        transition: background 140ms ease, border-color 140ms ease;
+      }
+      .md-checkbox .box::after {
+        content: "";
+        inline-size: 10px;
+        block-size: 6px;
+        border-inline-end: 2px solid transparent;
+        border-block-start: 2px solid transparent;
+        transform: rotate(45deg);
+      }
+      .md-checkbox input:checked ~ .box {
+        background: var(--md-sys-color-primary);
+        border-color: var(--md-sys-color-primary);
+      }
+      .md-checkbox input:checked ~ .box::after {
+        border-inline-end-color: var(--md-sys-color-on-primary);
+        border-block-start-color: var(--md-sys-color-on-primary);
+      }
+      .md-checkbox .label-text { color: var(--md-sys-color-on-surface); font-size: var(--font-size-body); }
+
+      /* Cards */
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+      .md-card {
+        background: var(--md-sys-color-surface);
+        color: var(--md-sys-color-on-surface);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+      .md-card.outlined { border: 1px solid var(--md-sys-color-outline-variant); }
+      .md-card.elevated { box-shadow: var(--elevation-1); }
+      .md-card .title { font-weight: var(--font-weight-medium); }
+      .md-card .subtitle { color: var(--md-sys-color-on-surface-variant); font-size: var(--font-size-body); }
+
+      /* Dialog */
+      .scrim {
+        position: fixed;
+        inset: 0;
+        background: var(--md-sys-color-scrim);
+        display: grid;
+        place-items: center;
+        z-index: 30;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+      }
+      .scrim.open { opacity: 1; pointer-events: auto; }
+      .md-dialog {
+        inline-size: min(560px, calc(100% - 32px));
+        background: var(--md-sys-color-surface);
+        color: var(--md-sys-color-on-surface);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--elevation-3);
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+      }
+      .md-dialog .headline { font-size: 20px; font-weight: var(--font-weight-medium); }
+      .md-dialog .actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+      /* Snackbar */
+      .md-snackbar {
+        position: fixed;
+        inset-inline: 16px;
+        inset-block-end: 80px; /* above bottom nav */
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: color-mix(in oklab, var(--md-sys-color-inverse-surface) 92%, var(--md-sys-color-surface));
+        color: var(--md-sys-color-inverse-on-surface);
+        border-radius: 8px;
+        box-shadow: var(--elevation-3);
+        transform: translateY(12px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 150ms ease, transform 150ms ease;
+        z-index: 40;
+      }
+      .md-snackbar.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+      .md-snackbar .label { flex: 1; }
+
+      /* FAB */
+      .md-fab {
+        position: fixed;
+        inset-inline-end: 16px;
+        inset-block-end: 96px; /* above bottom nav */
+        inline-size: 56px;
+        block-size: 56px;
+        border-radius: var(--radius-full);
+        display: grid;
+        place-items: center;
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+        box-shadow: var(--elevation-3);
+        border: none;
+        cursor: pointer;
+        z-index: 35;
+        overflow: hidden;
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        inset-inline: 0;
+        inset-block-end: 0;
+        height: 80px;
+        background: var(--md-sys-color-surface);
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        display: grid;
+        grid-auto-flow: column;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 20;
+      }
+      .bottom-nav .item {
+        display: grid;
+        place-items: center;
+        gap: 4px;
+        color: var(--md-sys-color-on-surface-variant);
+        text-decoration: none;
+      }
+      .bottom-nav .item.active { color: var(--md-sys-color-primary); }
+      .bottom-nav .icon {
+        inline-size: 24px; block-size: 24px;
+        display: inline-grid; place-items: center;
+        border-radius: var(--radius-full);
+      }
+      .bottom-nav .label { font-size: var(--font-size-label); }
+
+      /* Demo layout */
+      .section { display: grid; gap: 16px; margin-block: 16px; }
+      .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .section h3 { margin: 0; font-size: 18px; color: var(--md-sys-color-on-surface); }
+      .muted { color: var(--md-sys-color-on-surface-variant); font-size: var(--font-size-body); }
+
+      /* Support older browsers without color-mix */
+      @supports not (color: color-mix(in oklab, white 10%, black)) {
+        .md-icon-button:hover { background: rgba(0,0,0,0.08); }
+        .md-switch .track { background: rgba(0,0,0,0.16); }
+        html[data-theme="dark"] .md-switch .track { background: rgba(255,255,255,0.24); }
+        .md-snackbar { background: #313033; color: #F4EFF4; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-app-bar">
+      <button class="md-icon-button" aria-label="menu" data-ripple>≡</button>
+      <div class="title">رابط متریال ۳ (نمونه تک فایل)</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="themeToggle" class="md-icon-button" aria-label="toggle theme" data-ripple>🌙</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="section">
+        <p class="muted">این نمونه یک پیاده‌سازی سبک از سبک متریال ۳ است که تنها با HTML، CSS و JS ساخته شده و برای راست‌به‌چپ بهینه شده است.</p>
+      </section>
+
+      <section class="section">
+        <h3>دکمه‌ها</h3>
+        <div class="row">
+          <button class="md-button filled" data-ripple id="openDialogBtn">باز کردن دیالوگ</button>
+          <button class="md-button tonal" data-ripple id="showSnackBtn">نمایش اسنک‌بار</button>
+          <button class="md-button outlined" data-ripple>Outlined</button>
+          <button class="md-button elevated" data-ripple>Elevated</button>
+          <button class="md-button text" data-ripple>Text</button>
+          <button class="md-button filled" data-ripple disabled>Disabled</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>فیلدها</h3>
+        <div class="row" style="row-gap:16px; align-items:flex-start;">
+          <div class="md-field" style="inline-size: 280px;">
+            <input id="f1" type="text" placeholder=" " required />
+            <label for="f1">نام</label>
+            <div class="supporting-text">نام خود را وارد کنید</div>
+          </div>
+          <div class="md-field" style="inline-size: 320px;">
+            <input id="f2" type="email" placeholder=" " />
+            <label for="f2">ایمیل</label>
+            <div class="supporting-text">اختیاری</div>
+          </div>
+          <div class="md-field" style="inline-size: 220px;">
+            <input id="f3" type="password" placeholder=" " />
+            <label for="f3">رمز عبور</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>سوییچ و چک‌باکس</h3>
+        <div class="row">
+          <label class="md-switch" data-ripple>
+            <input type="checkbox" id="demoSwitch" />
+            <span class="track"><span class="thumb"></span></span>
+            <span class="label-text">فعال‌سازی</span>
+          </label>
+
+          <label class="md-checkbox" data-ripple>
+            <input type="checkbox" id="demoCheck" />
+            <span class="box"></span>
+            <span class="label-text">پذیرش قوانین</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>کارت‌ها</h3>
+        <div class="cards">
+          <article class="md-card elevated">
+            <div class="title">کارت بالا آمده</div>
+            <div class="subtitle">نمونه کارت با سایه</div>
+            <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ.</p>
+            <div class="row">
+              <button class="md-button text" data-ripple>لغو</button>
+              <button class="md-button filled" data-ripple>تأیید</button>
+            </div>
+          </article>
+
+          <article class="md-card outlined">
+            <div class="title">کارت حاشیه‌دار</div>
+            <div class="subtitle">نمونه کارت با حاشیه</div>
+            <p>این کارت با حالت outlined نمایش داده می‌شود.</p>
+            <div class="row">
+              <button class="md-button tonal" data-ripple>جزئیات</button>
+              <button class="md-button outlined" data-ripple>اشتراک</button>
+            </div>
+          </article>
+
+          <article class="md-card">
+            <div class="title">کارت ساده</div>
+            <div class="subtitle">بدون سایه یا حاشیه</div>
+            <p>برای محتوای معمولی می‌توانید از این کارت استفاده کنید.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- FAB -->
+    <button class="md-fab" id="fab" aria-label="Add" data-ripple>＋</button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="#" class="item active" data-ripple>
+        <span class="icon">🏠</span>
+        <span class="label">خانه</span>
+      </a>
+      <a href="#" class="item" data-ripple>
+        <span class="icon">🔎</span>
+        <span class="label">جستجو</span>
+      </a>
+      <a href="#" class="item" data-ripple>
+        <span class="icon">⚙️</span>
+        <span class="label">تنظیمات</span>
+      </a>
+    </nav>
+
+    <!-- Dialog -->
+    <div class="scrim" id="dialogScrim" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="md-dialog" role="document">
+        <div class="headline">نمونه دیالوگ</div>
+        <div class="body">آیا با ذخیره‌سازی تغییرات موافقید؟</div>
+        <div class="actions">
+          <button class="md-button text" data-ripple id="dialogCancel">لغو</button>
+          <button class="md-button filled" data-ripple id="dialogOk">ذخیره</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snackbar -->
+    <div class="md-snackbar" id="snackbar" role="status" aria-live="polite">
+      <div class="label" id="snackbarLabel">ذخیره شد</div>
+      <button class="md-button text" data-ripple id="snackbarDismiss">بستن</button>
+    </div>
+
+    <script>
+      (function() {
+        const root = document.documentElement;
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedTheme = localStorage.getItem('m3-theme');
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          root.setAttribute('data-theme', 'dark');
+        }
+
+        const themeToggle = document.getElementById('themeToggle');
+        function updateThemeIcon() {
+          const isDark = root.getAttribute('data-theme') === 'dark';
+          themeToggle.textContent = isDark ? '☀️' : '🌙';
+          themeToggle.setAttribute('aria-label', isDark ? 'switch to light' : 'switch to dark');
+        }
+        updateThemeIcon();
+        themeToggle.addEventListener('click', () => {
+          const isDark = root.getAttribute('data-theme') === 'dark';
+          const next = isDark ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          localStorage.setItem('m3-theme', next);
+          updateThemeIcon();
+          rippleFromCenter(themeToggle);
+        });
+
+        // Ripple effect for any [data-ripple] element
+        function createRipple(event) {
+          const target = event.currentTarget;
+          const rect = target.getBoundingClientRect();
+          const ripple = document.createElement('span');
+          ripple.className = 'ripple';
+          const size = Math.max(rect.width, rect.height);
+          const x = (event.clientX || (rect.left + rect.width / 2)) - rect.left - size / 2;
+          const y = (event.clientY || (rect.top + rect.height / 2)) - rect.top - size / 2;
+          ripple.style.inlineSize = ripple.style.blockSize = size + 'px';
+          ripple.style.insetInlineStart = x + 'px';
+          ripple.style.insetBlockStart = y + 'px';
+          target.appendChild(ripple);
+          ripple.addEventListener('animationend', () => ripple.remove());
+        }
+        function rippleFromCenter(el) {
+          const rect = el.getBoundingClientRect();
+          const fakeEvent = { currentTarget: el, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2 };
+          createRipple(fakeEvent);
+        }
+        document.querySelectorAll('[data-ripple]').forEach(el => {
+          el.addEventListener('pointerdown', createRipple);
+        });
+
+        // Dialog
+        const scrim = document.getElementById('dialogScrim');
+        const openDialogBtn = document.getElementById('openDialogBtn');
+        const dialogCancel = document.getElementById('dialogCancel');
+        const dialogOk = document.getElementById('dialogOk');
+        function openDialog() {
+          scrim.classList.add('open');
+          scrim.setAttribute('aria-hidden', 'false');
+        }
+        function closeDialog() {
+          scrim.classList.remove('open');
+          scrim.setAttribute('aria-hidden', 'true');
+        }
+        openDialogBtn.addEventListener('click', openDialog);
+        dialogCancel.addEventListener('click', closeDialog);
+        dialogOk.addEventListener('click', function(){
+          closeDialog();
+          showSnackbar('با موفقیت ذخیره شد');
+        });
+        scrim.addEventListener('click', (e) => { if (e.target === scrim) closeDialog(); });
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDialog(); });
+
+        // Snackbar
+        const snackbar = document.getElementById('snackbar');
+        const snackbarLabel = document.getElementById('snackbarLabel');
+        const snackbarDismiss = document.getElementById('snackbarDismiss');
+        let snackbarTimer = null;
+        function showSnackbar(message, timeout = 4000) {
+          snackbarLabel.textContent = message;
+          snackbar.classList.add('open');
+          clearTimeout(snackbarTimer);
+          snackbarTimer = setTimeout(() => snackbar.classList.remove('open'), timeout);
+        }
+        snackbarDismiss.addEventListener('click', () => snackbar.classList.remove('open'));
+        document.getElementById('showSnackBtn').addEventListener('click', () => showSnackbar('سلام! این یک اسنک‌بار است.'));
+
+        // FAB demo
+        document.getElementById('fab').addEventListener('click', () => showSnackbar('آیتم جدید اضافه شد'));
+      })();
+    </script>
+  </body>
+</html>
